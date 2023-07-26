@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="GBK"?>
+<!DOCTYPE sqlMapConfig PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+	<settings useStatementNamespaces="true" enhancementEnabled="true"
+		errorTracingEnabled="true" lazyLoadingEnabled="false" />
+		<!-- FIXME -->
+	<!--  sqlMap resource="ibatis/ting_passport_tb_share_doc_template_SqlMap.xml" />-->
+	
+</sqlMapConfig>
+

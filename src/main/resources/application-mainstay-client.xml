@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util-3.0.xsd
+        "
+	default-lazy-init="false">
+
+	<util:properties id="thrift" location="classpath:thrift.properties" />
+	<util:properties id="mainstay" location="classpath:mainstay.properties" />
+
+	<bean id="mainstayConfig" class="com.ximalaya.mainstay.spring.config.MainstayConfig">
+		<property name="zkConnectString" value="#{mainstay['zk.connection']}" />
+		<property name="webConsoleUrl" value="#{mainstay['zk.console.url']}" />
+		<property name="zkSessionTimeoutMills" value="#{mainstay['zk.session.timeout']}" />
+		<property name="zkConnectionTimeoutMills" value="#{mainstay['zk.connect.timeout']}" />
+	</bean>
+
+	<bean id="poolConfig"
+		class="com.ximalaya.mainstay.spring.config.ConnectionPoolConfig">
+		<property name="maxTotal" value="#{thrift['mainstay.client.pool.maxActive']}" />
+		<property name="minIdle" value="#{thrift['mainstay.client.pool.minIdle']}" />
+		<property name="maxIdle" value="#{thrift['mainstay.client.pool.maxIdle']}" />
+		<property name="maxWaitMillis" value="#{thrift['mainstay.client.pool.maxWait']}" />
+		<property name="testWhileIdle"
+			value="#{thrift['mainstay.client.pool.testWhileIdle']}" />
+		<property name="timeBetweenEvictionRunsMillis"
+			value="#{thrift['mainstay.client.pool.timeBetweenEvictionRunsMillis']}" />
+		<property name="numTestsPerEvictionRun"
+			value="#{thrift['mainstay.client.pool.numTestsPerEvictionRun']}" />
+		<property name="minEvictableIdleTimeMillis"
+			value="#{thrift['mainstay.client.pool.minEvictableIdleTimeMillis']}" />
+		<property name="softMinEvictableIdleTimeMillis"
+			value="#{thrift['mainstay.client.pool.softMinEvictableIdleTimeMillis']}" />
+	</bean>
+
+	<bean id="clientConfig" class="com.ximalaya.mainstay.spring.config.ClientConfig">
+		<property name="group" value="#{thrift['data.group']}" />
+		<property name="routingType" value="roundrobin" />
+		<property name="multiplex" value="true" />
+	</bean>
+
+	<bean id="EventService" class="com.ximalaya.mainstay.spring.thrift.MainstayClient">
+		<property name="ifaceClass"
+			value="com.ximalaya.data.stat.query.event.EventService.Iface" />
+		<property name="poolConfig" ref="poolConfig" />
+		<property name="mainstayConfig" ref="mainstayConfig" />
+		<property name="clientConfig" ref="clientConfig" />
+	</bean>
+
+</beans>

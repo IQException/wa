@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+						http://www.springframework.org/schema/context
+						http://www.springframework.org/schema/context/spring-context-3.0.xsd"
+	default-lazy-init="false">
+
+	<bean id="commentCollector" class="com.ximalaya.wa.collector.core.Collector">
+		<property name="type" value="Comment" />
+	</bean>
+	<bean id="shareCollector" class="com.ximalaya.wa.collector.core.Collector">
+		<property name="type" value="Share" />
+	</bean>
+	<bean id="searchCollector" class="com.ximalaya.wa.collector.core.Collector">
+		<property name="type" value="Search" />
+	</bean>
+	<bean id="upDloadCollector" class="com.ximalaya.wa.collector.core.Collector">
+		<property name="type" value="UpDownload" />
+	</bean>
+	<bean id="starCollector" class="com.ximalaya.wa.collector.core.Collector">
+		<property name="type" value="Star" />
+	</bean>
+	<bean id="subscribeCollector" class="com.ximalaya.wa.collector.core.Collector">
+		<property name="type" value="Subscribe" />
+	</bean>
+	<bean id="playCollector" class="com.ximalaya.wa.collector.core.Collector">
+		<property name="type" value="Play" />
+	</bean>
+	<bean id="payCollector" class="com.ximalaya.wa.collector.core.Collector">
+		<property name="type" value="Donate" />
+	</bean>
+	<bean id="loginCollector" class="com.ximalaya.wa.collector.core.Collector">
+		<property name="type" value="Login" />
+	</bean>
+	<bean id="accountCollector" class="com.ximalaya.wa.collector.core.Collector">
+		<property name="type" value="Account" />
+	</bean>
+	<bean id="filterCollector" class="com.ximalaya.wa.collector.core.Collector">
+		<property name="type" value="Filter" />
+	</bean>
+
+
+	<bean id="playMonitorCollector" class="com.ximalaya.wa.collector.core.MonitorCollector">
+		<property name="type" value="Play" />
+	</bean>
+
+	<bean id="bulletMonitorCollector" class="com.ximalaya.wa.collector.core.MonitorCollector">
+		<property name="type" value="Bullet" />
+	</bean>
+		
+	<bean id="rechargeMonitorCollector" class="com.ximalaya.wa.collector.core.MonitorCollector">
+		<property name="type" value="Recharge" />
+	</bean>
+	
+	<bean id="paymentMonitorCollector" class="com.ximalaya.wa.collector.core.MonitorCollector">
+		<property name="type" value="Payment" />
+	</bean>
+	
+	<bean id="paymentOrderMonitorCollector" class="com.ximalaya.wa.collector.core.MonitorCollector">
+		<property name="type" value="PaymentOrder" />
+	</bean>
+	
+</beans>

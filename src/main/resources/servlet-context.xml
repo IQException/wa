@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:mvc="http://www.springframework.org/schema/mvc"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd 
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-3.2.xsd 
+		http://www.springframework.org/schema/mvc
+		http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd "
+	default-lazy-init="false">
+	<context:annotation-config />
+	<!-- FIXME -->
+	<context:component-scan base-package="com.ximalaya.wa.controller" />	
+	
+	<context:property-placeholder location="classpath*:*.properties"
+		ignore-resource-not-found="true" ignore-unresolvable="true" />
+	
+<mvc:annotation-driven>
+   <mvc:return-value-handlers>
+			<bean class="com.ximalaya.mobile.common.returnvalue.handler.ResponseReturnValueHandler">
+				<property name="resultAssembler">
+					<bean class="com.ximalaya.mobile.common.assembler.ResultAssembler"></bean>
+				</property>
+			</bean>
+   </mvc:return-value-handlers>
+</mvc:annotation-driven>
+<mvc:annotation-driven/>
+     <mvc:interceptors>
+		<bean class="com.ximalaya.xdcs.spring.interceptor.XdcsSpringMvcInterceptor" />
+	</mvc:interceptors>
+
+
+	<bean
+		class="com.ximalaya.mobile.common.exception.resolver.BaseHandlerExceptionResolver">
+		<property name="messageSource" ref="messageSource" />
+	</bean>
+	
+
+	 
+
+</beans>

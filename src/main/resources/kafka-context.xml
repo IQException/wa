@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/rabbit
+                           http://www.springframework.org/schema/rabbit/spring-rabbit-1.0.xsd
+                           http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                           http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+	<util:properties id="kafka" location="classpath:kafka.properties" />
+
+	<!-- 消费端连接配置 -->
+	<bean id="kafkaConsumerConfig" class="com.ximalaya.kafka.consumer.KafkaConsumerConfig">
+		<property name="zkConnect" value="#{kafka['kafka.zk']}" />
+		<property name="zkSessionTimeoutMs" value="120000" />
+		<property name="zkSyncTimeMs" value="2000" />
+		<property name="autoCommitIntervalMs" value="1000" />
+		<property name="attributes">
+			<map>
+				<!-- 一个消费者组中(consumer数量<partitions数量)每当有consumer发送变化，会触发负载均衡 本项目有五个实例,是先后启动的 -->
+				<entry key="rebalance.backoff.ms" value="20000" />
+				<entry key="rebalance.max.retries" value="10" />
+				<entry key="auto.offset.reset" value="largest" />								
+			</map>
+		</property>
+	</bean>
+
+	<bean id="interactionConsumerListener"
+		class="com.ximalaya.wa.collector.listener.InteractionConsumerListener"></bean>
+
+	<bean id="interactionConsumerAdapter"
+		class="com.ximalaya.kafka.consumer.KafkaConsumerListenerAdapter">
+		<property name="groupId" value="#{kafka['broker.group.id']}"></property>
+		<property name="topic" value="#{kafka['kafka.topic.interaction']}" />
+		<property name="processThreads" value="2"></property>
+		<property name="consumerListener" ref="interactionConsumerListener"></property>
+	</bean>
+
+	<bean id="accountConsumerListener"
+		class="com.ximalaya.wa.collector.listener.AccountConsumerListener"></bean>
+
+	<bean id="accountConsumerAdapter"
+		class="com.ximalaya.kafka.consumer.KafkaConsumerListenerAdapter">
+		<property name="groupId" value="#{kafka['broker.group.id']}"></property>
+		<property name="topic" value="#{kafka['kafka.topic.account']}" />
+		<property name="processThreads" value="4"></property>
+		<property name="consumerListener" ref="accountConsumerListener"></property>
+	</bean>
+
+
+	<bean id="contentConsumerListener"
+		class="com.ximalaya.wa.collector.listener.ContentConsumerListener"></bean>
+
+	<bean id="contentConsumerAdapter"
+		class="com.ximalaya.kafka.consumer.KafkaConsumerListenerAdapter">
+		<property name="groupId" value="#{kafka['broker.group.id']}"></property>
+		<property name="topic" value="#{kafka['kafka.topic.content']}" />
+		<property name="processThreads" value="2"></property>
+		<property name="consumerListener" ref="contentConsumerListener"></property>
+	</bean>
+
+
+	<bean id="downloadConsumerListener"
+		class="com.ximalaya.wa.collector.listener.DownloadConsumerListener"></bean>
+
+	<bean id="downloadConsumerAdapter"
+		class="com.ximalaya.kafka.consumer.KafkaConsumerListenerAdapter">
+		<property name="groupId" value="#{kafka['broker.group.id']}"></property>
+		<property name="topic" value="#{kafka['kafka.topic.download']}" />
+		<property name="processThreads" value="4"></property>
+		<property name="consumerListener" ref="downloadConsumerListener"></property>
+	</bean>
+
+	<bean id="searchConsumerListener"
+		class="com.ximalaya.wa.collector.listener.SearchConsumerListener"></bean>
+
+	<bean id="searchConsumerAdapter"
+		class="com.ximalaya.kafka.consumer.KafkaConsumerListenerAdapter">
+		<property name="groupId" value="#{kafka['broker.group.id']}"></property>
+		<property name="topic" value="#{kafka['kafka.topic.search']}" />
+		<property name="processThreads" value="2"></property>
+		<property name="consumerListener" ref="searchConsumerListener"></property>
+	</bean>
+
+	<bean id="playConsumerListener" class="com.ximalaya.wa.collector.listener.PlayConsumerListener"></bean>
+
+	<bean id="playConsumerAdapter"
+		class="com.ximalaya.kafka.consumer.KafkaConsumerListenerAdapter">
+		<property name="groupId" value="#{kafka['broker.group.id']}"></property>
+		<property name="topic" value="#{kafka['kafka.topic.play']}" />
+		<property name="processThreads" value="8"></property>
+		<property name="consumerListener" ref="playConsumerListener"></property>
+	</bean>
+
+	<bean id="payConsumerListener" class="com.ximalaya.wa.collector.listener.PayConsumerListener"></bean>
+
+	<bean id="payConsumerAdapter"
+		class="com.ximalaya.kafka.consumer.KafkaConsumerListenerAdapter">
+		<property name="groupId" value="#{kafka['broker.group.id']}"></property>
+		<property name="topic" value="#{kafka['kafka.topic.pay']}" />
+		<property name="processThreads" value="1"></property>
+		<property name="consumerListener" ref="payConsumerListener"></property>
+	</bean>
+	
+	<bean id="paidConsumerListener" class="com.ximalaya.wa.collector.listener.PaidConsumerListener"></bean>
+
+	<bean id="paidConsumerAdapter"
+		class="com.ximalaya.kafka.consumer.KafkaConsumerListenerAdapter">
+		<property name="groupId" value="#{kafka['broker.group.id']}"></property>
+		<property name="topic" value="#{kafka['kafka.topic.paid']}" />
+		<property name="processThreads" value="1"></property>
+		<property name="consumerListener" ref="paidConsumerListener"></property>
+	</bean>
+
+
+	<bean class="com.ximalaya.kafka.consumer.KafkaLifeCycleConsumerListenerContainer">
+		<property name="consumerListeners">
+			<list>
+				<ref bean="interactionConsumerAdapter"></ref>
+				<ref bean="playConsumerAdapter"></ref>
+				<ref bean="searchConsumerAdapter"></ref>
+				<ref bean="downloadConsumerAdapter"></ref>
+				<ref bean="contentConsumerAdapter"></ref>
+				<ref bean="accountConsumerAdapter"></ref> 
+				<ref bean="payConsumerAdapter"></ref> 
+				<ref bean="paidConsumerAdapter"></ref> 
+			</list>
+		</property>
+		<property name="phase" value="1"></property>
+		<property name="kafkaConsumerConfig" ref="kafkaConsumerConfig"></property>
+		<property name="keyStringDecoder">
+			<bean
+				class="com.ximalaya.data.kafka.serializer.auto.string.StringKeyFacadeDecoder">
+				<constructor-arg>
+					<null></null>
+				</constructor-arg>
+			</bean>
+		</property>
+		<property name="valueStringDecoder">
+			<bean
+				class="com.ximalaya.data.kafka.serializer.auto.string.StringValueFacadeDecoder">
+				<constructor-arg>
+					<null></null>
+				</constructor-arg>
+			</bean>
+		</property>
+
+	</bean>
+	
+	<!-- kafka生产者 -->
+	<bean id="userTemplate" class="com.ximalaya.kafka.producer.KafkaProducerTemplate">
+		<property name="topic" value="#{kafka['kafka.wa.manage.user']}"></property>
+		<property name="kafkaProducerConfig" ref="kafkaProducerConfig"></property>
+	</bean>
+	
+	<bean id="kafkaProducerConfig" class="com.ximalaya.kafka.producer.KafkaProducerConfig">
+		<property name="brokers" value="#{kafka['broker.list']}"></property>
+		<property name="serializerClass" value="kafka.serializer.StringEncoder"></property>
+		<property name="ack" value="-1"></property>
+	</bean>
+
+</beans>

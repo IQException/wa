@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+						http://www.springframework.org/schema/context
+						http://www.springframework.org/schema/context/spring-context-3.0.xsd
+						http://www.springframework.org/schema/mvc
+						http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+						http://www.springframework.org/schema/util
+						http://www.springframework.org/schema/util/spring-util-3.0.xsd"
+	default-lazy-init="false">
+	<!-- 控制器 -->
+	<context:component-scan base-package="com.ximalaya.wa.controller" />
+	<mvc:annotation-driven content-negotiation-manager="cnManager" />
+	
+	<!-- <mvc:annotation-driven /> -->
+	<mvc:interceptors>
+		<bean class="com.ximalaya.xdcs.spring.interceptor.XdcsSpringMvcInterceptor" />
+	</mvc:interceptors>
+	
+	<!-- 加载配置文件 -->
+	<context:property-placeholder location="classpath*:*.properties"
+		ignore-resource-not-found="true" ignore-unresolvable="true" />
+	
+	<!-- content negotiation -->
+	<bean id="cnManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+		<property name="favorPathExtension" value="true" />
+		<property name="favorParameter" value="true" />
+		<property name="ignoreAcceptHeader" value="true" />
+		<property name="useJaf" value="false"/>
+		<property name="parameterName" value="mediaType" />
+		<property name="defaultContentType" value="text/html;charset=utf-8" />
+		<property name="mediaTypes">
+			<map>
+				<entry key="xml" value="application/xml" />
+				<entry key="json" value="application/json" />
+			</map>
+		</property>
+	</bean>
+	
+	<!-- velocity template -->
+	<!-- <bean class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
+		<property name="resourceLoaderPath" value="/WEB-INF/tpl/" />
+		<property name="configLocation" value="classpath:velocity.properties" />
+	</bean>
+	
+	<bean class="org.springframework.web.servlet.view.velocity.VelocityViewResolver">
+		<property name="cache" value="false" />
+		<property name="prefix" value="" />
+		<property name="suffix" value=".vm" />
+		<property name="contentType" value="text/html;charset=utf-8" />
+		<property name="requestContextAttribute" value="rc"/>
+	</bean> -->
+</beans>

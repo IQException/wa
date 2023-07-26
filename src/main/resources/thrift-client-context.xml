@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+						http://www.springframework.org/schema/context
+						http://www.springframework.org/schema/context/spring-context-3.0.xsd
+						http://www.springframework.org/schema/util
+						http://www.springframework.org/schema/util/spring-util-3.0.xsd"
+	default-lazy-init="false">
+	<util:properties id="thrift" location="classpath:thrift.properties" />
+	<util:properties id="mainstay" location="classpath:mainstay.properties" />
+
+	<bean id="mainstayConfig" class="com.ximalaya.mainstay.spring.config.MainstayConfig">
+		<property name="zkConnectString" value="#{mainstay['zk.connection']}" />
+		<property name="webConsoleUrl" value="#{mainstay['zk.console.url']}" />
+		<property name="zkSessionTimeoutMills" value="#{mainstay['zk.session.timeout']}" />
+		<property name="zkConnectionTimeoutMills" value="#{mainstay['zk.connect.timeout']}" />
+	</bean>
+
+	<!-- stat-count-client -->
+	<bean id="simpleCollecterClientConfig" class="com.ximalaya.thrift.client.TClientConfig">
+		<constructor-arg
+			value="com.ximalaya.stat.count.thrift.RemoteSimpleCountCollecter.Iface" />
+		<constructor-arg value="false" />
+	</bean>
+
+	<bean id="simpleCollecterConnectionConfig" class="com.ximalaya.thrift.client.TConnectionConfig">
+		<property name="host" value="#{thrift['statcount.thrift.host']}" />
+		<property name="port" value="#{thrift['statcount.thrift.port']}" />
+		<property name="timeout" value="#{thrift['statcount.thrift.soTimeout']}" />
+		<!-- bert update -->
+		<property name="transportType" value="nonblocking"></property>
+		<property name="transportWrapperType" value="none"></property>
+	</bean>
+
+	<bean id="simpleCollecterConnectionPoolConfig" class="com.ximalaya.thrift.client.TConnectionPoolConfig">
+		<property name="maxTotal" value="#{thrift['statcount.thrift.maxActive']}" />
+		<property name="minIdle" value="#{thrift['statcount.thrift.minIdle']}" />
+		<property name="maxIdle" value="#{thrift['statcount.thrift.maxIdle']}" />
+		<property name="maxWaitMillis" value="#{thrift['statcount.thrift.maxWait']}" />
+		<property name="testWhileIdle" value="#{thrift['statcount.thrift.testWhileIdle']}" />
+		<property name="timeBetweenEvictionRunsMillis"
+			value="#{thrift['statcount.thrift.timeBetweenEvictionRunsMillis']}" />
+		<property name="numTestsPerEvictionRun"
+			value="#{thrift['statcount.thrift.numTestsPerEvictionRun']}" />
+		<property name="minEvictableIdleTimeMillis"
+			value="#{thrift['statcount.thrift.minEvictableIdleTimeMillis']}" />
+		<property name="softMinEvictableIdleTimeMillis"
+			value="#{thrift['statcount.thrift.softMinEvictableIdleTimeMillis']}" />
+	</bean>
+
+	<bean id="simpleCollecterClient" class="com.ximalaya.thrift.client.TClientFactoryBean">
+		<property name="clientConfig" ref="simpleCollecterClientConfig" />
+		<property name="connectionConfig" ref="simpleCollecterConnectionConfig" />
+		<property name="connectionPoolConfig" ref="simpleCollecterConnectionPoolConfig" />
+	</bean>
+
+	<bean id="thriftSimpleCountCollecterClient"
+		class="com.ximalaya.stat.count.client.thrift.ThriftSimpleCountCollecterClient">
+		<property name="statCountClient" ref="simpleCollecterClient"></property>
+	</bean>
+
+
+	<!-- passport service -->
+	<bean id="passportConnectionPoolConfig"
+		class="com.ximalaya.mainstay.spring.config.ConnectionPoolConfig">
+		<property name="maxTotal" value="#{thrift['passport.thrift.maxActive']}" />
+		<property name="minIdle" value="#{thrift['passport.thrift.minIdle']}" />
+		<property name="maxIdle" value="#{thrift['passport.thrift.maxIdle']}" />
+		<property name="maxWaitMillis" value="#{thrift['passport.thrift.maxWait']}" />
+		<property name="testWhileIdle" value="#{thrift['passport.thrift.testWhileIdle']}" />
+		<property name="timeBetweenEvictionRunsMillis"
+			value="#{thrift['passport.thrift.timeBetweenEvictionRunsMillis']}" />
+		<property name="numTestsPerEvictionRun"
+			value="#{thrift['passport.thrift.numTestsPerEvictionRun']}" />
+		<property name="minEvictableIdleTimeMillis"
+			value="#{thrift['passport.thrift.minEvictableIdleTimeMillis']}" />
+		<property name="softMinEvictableIdleTimeMillis"
+			value="#{thrift['passport.thrift.softMinEvictableIdleTimeMillis']}" />
+	</bean>
+
+
+	<bean id="passportClientConfig" class="com.ximalaya.mainstay.spring.config.ClientConfig">
+		<property name="group" value="passport-service"></property>
+		<property name="routingType" value="roundrobin" />
+		<property name="multiplex" value="true"></property>
+	</bean>
+
+
+	<bean class="com.ximalaya.mainstay.spring.thrift.MainstayClient">
+		<property name="ifaceClass"
+			value="com.ximalaya.passport.thrift.RemotePassportService.Iface"></property>
+		<property name="poolConfig" ref="passportConnectionPoolConfig"></property>
+		<property name="mainstayConfig" ref="mainstayConfig"></property>
+		<property name="clientConfig" ref="passportClientConfig"></property>
+	</bean>
+
+	<!-- sms service -->
+	<bean id="smsConnectionPoolConfig"
+		class="com.ximalaya.mainstay.spring.config.ConnectionPoolConfig">
+		<property name="maxTotal" value="#{thrift['sms.thrift.maxActive']}" />
+		<property name="minIdle" value="#{thrift['sms.thrift.minIdle']}" />
+		<property name="maxIdle" value="#{thrift['sms.thrift.maxIdle']}" />
+		<property name="maxWaitMillis" value="#{thrift['sms.thrift.maxWait']}" />
+		<property name="testWhileIdle" value="#{thrift['sms.thrift.testWhileIdle']}" />
+		<property name="timeBetweenEvictionRunsMillis"
+			value="#{thrift['sms.thrift.timeBetweenEvictionRunsMillis']}" />
+		<property name="numTestsPerEvictionRun"
+			value="#{thrift['sms.thrift.numTestsPerEvictionRun']}" />
+		<property name="minEvictableIdleTimeMillis"
+			value="#{thrift['sms.thrift.minEvictableIdleTimeMillis']}" />
+		<property name="softMinEvictableIdleTimeMillis"
+			value="#{thrift['sms.thrift.softMinEvictableIdleTimeMillis']}" />
+	</bean>
+
+
+	<bean id="smsClientConfig" class="com.ximalaya.mainstay.spring.config.ClientConfig">
+		<property name="group" value="xmsms"></property>
+		<property name="routingType" value="roundrobin" />
+		<property name="multiplex" value="true"></property>
+	</bean>
+
+
+	<bean class="com.ximalaya.mainstay.spring.thrift.MainstayClient">
+		<property name="ifaceClass"
+			value="com.ximalaya.xmsms.inf.api.SendMessageService.Iface"></property>
+		<property name="poolConfig" ref="smsConnectionPoolConfig"></property>
+		<property name="mainstayConfig" ref="mainstayConfig"></property>
+		<property name="clientConfig" ref="smsClientConfig"></property>
+	</bean>
+
+</beans>
